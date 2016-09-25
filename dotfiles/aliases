@@ -19,7 +19,7 @@ alias iptlistout='iptables -L OUTPUT -n -v --line-numbers'
 alias iptlistfw='iptables -L FORWARD -n -v --line-numbers'
 alias myip='curl icanhazip.com'
 
-# tmux
+# tmux test
 alias tmux="tmux -2"
 alias tma='tmux attach -d -t'
 alias tmn='tmux new -s $(basename $(pwd))'
