@@ -1,0 +1,15 @@
+[user]
+	email = vbauerster@gmail.com
+	name = Vladimir Bauer
+[core]
+  excludesfile = ~/.gitignore
+  editor = vim
+[alias]
+  co = checkout
+  ci = commit
+  st = status
+  br = branch
+  d  = diff -w
+  hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	stat = log --pretty=format:\"[%h] %ae, %ar: %s\" --stat
+  last = cat-file commit HEAD

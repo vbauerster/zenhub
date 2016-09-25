@@ -1,0 +1,26 @@
+alias u='ll -A'
+alias md='mkdcd'
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../../../'
+alias du='du -ch'
+alias path='echo -e ${PATH//:/\\n}'
+alias now='date +"%T"'
+alias nowtime=now
+alias nowdate='date +"%d-%m-%Y"'
+alias header='culr -I'
+alias e=vim
+alias q=exit
+alias dnsdump='tcpdump -lvi any "udp port 53"'
+alias httpdump='tcpdump -i eth0 -n -s 0 -w - | grep -a -o -E "Host\: .*|GET \/.*"'
+alias iptlist='iptables -L -n -v --line-numbers'
+alias iptlistin='iptables -L INPUT -n -v --line-numbers'
+alias iptlistout='iptables -L OUTPUT -n -v --line-numbers'
+alias iptlistfw='iptables -L FORWARD -n -v --line-numbers'
+alias myip='curl icanhazip.com'
+
+# tmux
+alias tmux="tmux -2"
+alias tma='tmux attach -d -t'
+alias tmn='tmux new -s $(basename $(pwd))'
+alias tml='tmux list-sessions'
