@@ -18,9 +18,14 @@ alias iptlistin='iptables -L INPUT -n -v --line-numbers'
 alias iptlistout='iptables -L OUTPUT -n -v --line-numbers'
 alias iptlistfw='iptables -L FORWARD -n -v --line-numbers'
 alias myip='curl icanhazip.com'
+alias lsports='netstat -an | grep LISTEN'
 
 # tmux test
 alias tmux="tmux -2"
 alias tma='tmux attach -d -t'
 alias tmn='tmux new -s $(basename $(pwd))'
 alias tml='tmux list-sessions'
+
+alias dcrypt='/opt/etc/init.d/S09dnscrypt-proxy'
+alias up1='cat /etc/openvpn/client1/up'
+alias up2='cat /etc/openvpn/client2/up'
