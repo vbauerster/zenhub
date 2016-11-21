@@ -8,7 +8,8 @@
   co = checkout
   ci = commit
   st = status
-  br = branch
+  b = branch -v
+  br = branch -av
   d  = diff -w
   hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
 	stat = log --pretty=format:\"[%h] %ae, %ar: %s\" --stat
