@@ -21,9 +21,9 @@ Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-eunuch'
-Plugin 'tpope/vim-unimpaired'
+Plugin 'tpope/vim-characterize' " enhaced ga
+Plugin 'vbauerster/vim-unimpaired'
 Plugin 'tommcdo/vim-exchange'
-" Plugin 'justinmk/vim-dirvish'
 Plugin 'rafi/vim-tinyline'
 " Plugin 'kshenoy/vim-signature'
 
@@ -31,12 +31,18 @@ Plugin 'rafi/vim-tinyline'
 Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/gv.vim'
 
-Plugin 'junegunn/vim-peekaboo'
+" Plugin 'junegunn/vim-peekaboo'
 Plugin 'junegunn/rainbow_parentheses.vim'
 Plugin 'vbauerster/vim-highlighter'
 
 " Tmux
 " Plugin 'christoomey/vim-tmux-navigator'
+
+" Motions
+" Plugin 'justinmk/vim-sneak'
+
+" Misc.
+Plugin 'romainl/vim-qf'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -45,47 +51,6 @@ call vundle#end()            " required
 " ============================================================================
 " Script local functions {{{
 " ============================================================================
-
-function! s:isBufferOpen(bufname)
-  redir =>buflist
-  silent! ls!
-  redir END
-  for bufnum in map(filter(split(buflist, '\n'), 'v:val =~ "'.a:bufname.'"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
-    if bufwinnr(bufnum) != -1
-      return 1
-    endif
-  endfor
-endfunction
-
-" http://vim.wikia.com/wiki/Toggle_to_open_or_close_the_quickfix_window
-function! s:toggleList(bufname, pfx)
-  if <sid>isBufferOpen(a:bufname)
-    exec(a:pfx.'close')
-    return
-  endif
-  if a:pfx == 'l' && len(getloclist(0)) == 0
-      echohl ErrorMsg
-      echo "Location List is Empty."
-      return
-  endif
-  let winnr = winnr()
-  exec(a:pfx.'open')
-  if winnr() != winnr
-    wincmd p
-  endif
-endfunction
-
-function! s:scrolList(dir)
-  if empty(&buftype)
-    if <sid>isBufferOpen("Quickfix List")
-      return (a:dir ==# "cn" ? ":cnext" : ":cNext")."\<CR>"
-    endif
-    if <sid>isBufferOpen("Location List")
-      return (a:dir ==# "cn" ? ":lnext" : ":lNext")."\<CR>"
-    endif
-  endif
-  return a:dir ==# "cn" ? "\<C-n>" : "\<C-p>"
-endfunction
 
 function! s:helptab()
   if &buftype ==# "help"
@@ -217,19 +182,24 @@ nnoremap <F1> :help <C-r><C-w><CR>
 " tab shortcuts
 nnoremap g{ gT
 nnoremap g} gt
+nnoremap gt :tablast<CR>
+nnoremap gT :tabfirst<CR>
 nnoremap <Leader>tn :tabnew<CR>
 nnoremap <Leader>tx :tabclose<CR>
 
 " Save
-nnoremap <Leader>w :update<CR>
+" nnoremap <Leader>w :update<CR>
 
 " Quit nvim
 nnoremap <silent> <F10> :qa<CR>
 nnoremap <silent> <F22> :qa!<CR>
 " Quit/close window
+" <C-w> c Close the current window
+" <C-w> z Close any 'Preview' window currently open
+" <C-w> P Go to preview window
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>! :q!<CR>
-nnoremap <silent> <Leader>x :close<CR>
+nnoremap <Leader>xc <C-w>c
 
 " Read :help ctrl-w_w
 " Read :help wincmd
@@ -241,46 +211,18 @@ nnoremap <S-Tab> <C-w>W
 " make Y consistent with C and D. See :help Y.
 nnoremap Y y$
 
-" <C-w> c Close the current window
-" <C-w> z Close any "Preview" window currently open
-" <C-w> P Go to preview window
-
-" Toggle to open or close the quickfix window
-" http://vim.wikia.com/wiki/Toggle_to_open_or_close_the_quickfix_window
-" http://stackoverflow.com/questions/13208660/how-to-enable-mapping-only-if-there-is-no-quickfix-window-opened-in-vim
-nmap <silent> <leader>ll :call <sid>toggleList("Location List", 'l')<CR>
-nmap <silent> <leader>cc :call <sid>toggleList("Quickfix List", 'c')<CR>
-
-nnoremap <expr><C-n> <sid>scrolList("cn")
-nnoremap <expr><C-p> <sid>scrolList("cp")
-
-" Select blocks after indenting
-xnoremap < <gv
-xnoremap > >gv|
-
-" Use tab for indenting in visual mode
-xnoremap <Tab> >gv|
-xnoremap <S-Tab> <gv
-nnoremap > >>_
-nnoremap < <<_
-
 " reselect last paste
 nnoremap gp `[v`]
 
 " Search in normal mode with very magic on
 nnoremap / /\v
 nnoremap ? ?\v
-" Search in visually selected block only
-vnoremap / <Esc>/\%V\v
-vnoremap ? <Esc>?\%V\v
-
-vmap <leader>s :sort<CR>
 
 " moving up and down work as you would expect
 nnoremap <silent> j gj
 nnoremap <silent> k gk
-nnoremap <silent> ^ g^
-nnoremap <silent> $ g$
+" nnoremap <silent> ^ g^
+" nnoremap <silent> $ g$
 
 noremap <silent> + 4gj
 noremap <silent> - 4gk
@@ -300,6 +242,8 @@ nnoremap <silent> g# g#zz
 " fold a html tag
 nnoremap <leader>ft Vatzf
 
+nnoremap <Leader>bx vaBo0d
+
 " Read :help g_ctrl-]
 " same as :tjump
 " jump to tag if there's only one matching tag, but show list of
@@ -307,7 +251,7 @@ nnoremap <leader>ft Vatzf
 nnoremap <c-]> g<c-]>
 
 " Remove spaces at the end of lines
-nnoremap <silent><Leader>w<Leader> :<C-u>silent! keeppatterns %substitute/\s\+$//e<CR>
+" nnoremap <silent><Leader>w<Leader> :<C-u>silent! keeppatterns %substitute/\s\+$//e<CR>
 
 " Buffer reload
 nnoremap <Leader>rr :e!<CR>
@@ -316,32 +260,32 @@ nnoremap <Leader>rr :e!<CR>
 " bprev provided by unimpaired [b
 " bnext provided by unimpaired ]b
 nnoremap <silent><Leader>. <C-^><CR>
-nnoremap <Leader>bx :bd<CR>
-
-nnoremap <Leader>v <C-w>v
+nnoremap <Leader>xx :bd<CR>
 
 " Show Registers
 " nnoremap <leader>di :di<CR>
 
-" Highlight All
-nnoremap <Leader>ha :Highlight<CR>
+" Highlight word
+nnoremap <Leader>hw :Highlight<CR>
 nnoremap <silent><C-c> :call clearmatches()<CR>:noh<CR>
 
 " -----------------------------------------------------------
 " => h: window-resize
 " -----------------------------------------------------------
-" nnoremap <Leader>z :wincmd _<CR>:wincmd \|<CR>
-nnoremap <silent><Leader>- :wincmd =<CR>
+nnoremap <Leader><Bar> <C-w><Bar>
+nnoremap <Leader>= <C-w>=
+nnoremap <Leader>o <C-w>o
+nnoremap <Leader>v <C-w>v
 
 " http://stackoverflow.com/questions/1262154/minimizing-vertical-vim-window-splits
-" z{nr}<CR>  Set current window height to {nr}. 
-set winminheight=0
-nmap <Leader>k <C-W>j<C-W>_
-nmap <Leader>j <C-W>k<C-W>_
+" z{nr}<CR>  Set current window height to {nr}.
+" set winminheight=0
+" nmap <Leader>k <C-W>j<C-W>_
+" nmap <Leader>j <C-W>k<C-W>_
 
-set winminwidth=0
-nmap <Leader>l <C-W>h500<C-W>>
-nmap <Leader>h <C-W>l500<C-W>>
+" set winminwidth=0
+" nmap <Leader>l <C-W>h500<C-W>>
+" nmap <Leader>h <C-W>l500<C-W>>
 
 nnoremap <M-Left> <C-w>>
 nnoremap <M-Right> <C-w><
@@ -349,10 +293,14 @@ nnoremap <M-Up> <C-w>+
 nnoremap <M-Down> <C-w>-
 
 " -----------------------------------------------------------
-" => Command mode mappings
+" => vimgrep
 " -----------------------------------------------------------
-" refer to the directory of the current file, regardless of pwd
-cnoremap %% <C-R>=expand('%:h').'/'<CR>
+nmap <Leader>* ]I
+nmap <Leader># [I
+" find current word in quickfix
+nnoremap <Leader>g* :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<CR><C-w>W
+" find last search in quickfix
+" nnoremap <Leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR><C-w>W
 
 " -----------------------------------------------------------
 " => Insert mode mappings
@@ -369,6 +317,7 @@ inoremap II <Esc>I
 inoremap AA <Esc>A
 " <C-\> does not eat last char of the line
 inoremap CC <C-\><C-O>D
+
 inoremap ,. <Esc>
 
 " upper case
@@ -378,13 +327,39 @@ imap     <Nul> <C-Space>
 inoremap <C-Space> <C-x><C-l>
 
 " -----------------------------------------------------------
-" => vimgrep
+" => Visual and Select mode mappings
 " -----------------------------------------------------------
-nnoremap <Leader>* [I
-" find current word in quickfix
-nnoremap <Leader>** :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<CR><C-w>W
-" find last search in quickfix
-nnoremap <Leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR><C-w>W
+vnoremap ,. <Esc>
+
+" Search in visually selected block only
+vnoremap / <Esc>/\%V\v
+vnoremap ? <Esc>?\%V\v
+
+" With this map, we can select some text in visual mode and by invoking the map,
+" have the selection automatically filled in as the search text and the cursor
+" placed in the position for typing the replacement text. Also, this will ask
+" for confirmation before it replaces any instance of the search text in the
+" file.
+" NOTE: We're using %S here instead of %s; the capital S version comes from the
+" eregex.vim plugin and uses Perl-style regular expressions.
+vnoremap <C-r> "hy:%S/<C-r>h//c<left><left>
+
+" Select blocks after indenting
+xnoremap < <gv
+xnoremap > >gv
+
+" -----------------------------------------------------------
+" => Command mode mappings
+" -----------------------------------------------------------
+" refer to the directory of the current file, regardless of pwd
+cnoremap %% <C-R>=expand('%:h').'/'<CR>
+" quick save without hitting enter
+cnoremap ww <C-u>w<CR>
+" close location list
+cnoremap cc <C-u>lcl<CR>
+
+cnoremap <C-A> <Home>
+cnoremap <C-O> <Up>
 
 " }}}
 " ============================================================================
@@ -393,6 +368,9 @@ nnoremap <Leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR><C-w>W
 
 augroup vimrcEx
   autocmd!
+
+  " Remove trailing whitespaces
+  autocmd BufWritePre * :%s/\s\+$//e
 
   " Help in new tabs
   autocmd BufEnter *.txt call <sid>helptab()
@@ -446,7 +424,7 @@ nnoremap <silent> <leader>gw :Gwrite<CR>
 " Git rm %
 nnoremap <silent> <leader>gx :Gremove<CR>
 " Git checkout %
-nnoremap <silent> <leader>gr :Gread<CR>
+nnoremap <silent> <leader>gu :Gread<CR>
 
 " }}}
 " ============================================================================
@@ -459,5 +437,43 @@ nnoremap <silent> <leader>gca :GV<CR>
 nnoremap <silent> <leader>gco :GV!<CR>
 " Commits Revisions of the current file
 nnoremap <silent> <leader>gcr :GV?<CR>
+
+" }}}
+" ============================================================================
+" 'romainl/vim-qf' {{{
+" ============================================================================
+
+let g:qf_mapping_ack_style = 1
+nmap <Leader>cc <Plug>QfCtoggle
+nmap <Leader>ll <Plug>QfLtoggle
+nmap z. <Plug>QfSwitch
+
+" }}}
+" ============================================================================
+" 'justinmk/vim-sneak' {{{
+" ============================================================================
+
+" let g:sneak#prompt = 'sneak›'
+" To enable 'passive' or 'smart' streak-mode
+" let g:sneak#streak = 1
+" Enable the 'clever-s' feature
+" let g:sneak#s_next = 1
+" Case sensitivity is determined by 'ignorecase' and 'smartcase'.
+" let g:sneak#use_ic_scs = 1
+
+" replace 'f' with 1-char Sneak
+" nmap f <Plug>Sneak_f
+" nmap F <Plug>Sneak_F
+" xmap f <Plug>Sneak_f
+" xmap F <Plug>Sneak_F
+" omap f <Plug>Sneak_f
+" omap F <Plug>Sneak_F
+" replace 't' with 1-char Sneak
+" nmap t <Plug>Sneak_t
+" nmap T <Plug>Sneak_T
+" xmap t <Plug>Sneak_t
+" xmap T <Plug>Sneak_T
+" omap t <Plug>Sneak_t
+" omap T <Plug>Sneak_T
 
 " }}}
