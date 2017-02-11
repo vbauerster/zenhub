@@ -3,7 +3,6 @@
 	name = Vladimir Bauer
 [core]
   excludesfile = ~/.gitignore
-  editor = vim
 [alias]
   co = checkout
   ci = commit
@@ -11,6 +10,7 @@
   b = branch -v
   br = branch -av
   d  = diff -w
+  r = remote -v
   hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
 	stat = log --pretty=format:\"[%h] %ae, %ar: %s\" --stat
   last = cat-file commit HEAD
