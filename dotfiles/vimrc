@@ -22,6 +22,7 @@ Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-eunuch'
 Plugin 'tpope/vim-characterize' " enhaced ga
+Plugin 'tpope/vim-capslock'     " <C-G>c in insert mode
 Plugin 'vbauerster/vim-unimpaired'
 Plugin 'tommcdo/vim-exchange'
 Plugin 'rafi/vim-tinyline'
@@ -187,19 +188,19 @@ nnoremap gT :tabfirst<CR>
 nnoremap <Leader>tn :tabnew<CR>
 nnoremap <Leader>tx :tabclose<CR>
 
-" Save
-" nnoremap <Leader>w :update<CR>
-
 " Quit nvim
-nnoremap <silent> <F10> :qa<CR>
-nnoremap <silent> <F22> :qa!<CR>
+" nnoremap <silent> <F10> :qa<CR>
+" nnoremap <silent> <F22> :qa!<CR>
 " Quit/close window
 " <C-w> c Close the current window
 " <C-w> z Close any 'Preview' window currently open
 " <C-w> P Go to preview window
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>! :q!<CR>
-nnoremap <Leader>xc <C-w>c
+nnoremap <F22> <C-w>c
+
+" Save in normal mode
+nnoremap <F2> :w<CR>
 
 " Read :help ctrl-w_w
 " Read :help wincmd
@@ -224,8 +225,13 @@ nnoremap <silent> k gk
 " nnoremap <silent> ^ g^
 " nnoremap <silent> $ g$
 
-noremap <silent> + 4gj
-noremap <silent> - 4gk
+noremap <silent> + 5gj
+noremap <silent> } 5gk
+noremap { }
+noremap - {
+
+noremap <m-+> 14gj
+noremap <m-}> 14gk
 
 " vim-vertical-move
 noremap <expr> gj <SID>vjump(0)
@@ -259,23 +265,23 @@ nnoremap <Leader>rr :e!<CR>
 " switch between buffers
 " bprev provided by unimpaired [b
 " bnext provided by unimpaired ]b
-nnoremap <silent><Leader>. <C-^><CR>
-nnoremap <Leader>xx :bd<CR>
+nnoremap <silent>,. <C-^><CR>
+nnoremap <silent> <F10> :bd<CR>
 
 " Show Registers
 " nnoremap <leader>di :di<CR>
 
 " Highlight word
 nnoremap <Leader>hw :Highlight<CR>
-nnoremap <silent><C-c> :call clearmatches()<CR>:noh<CR>
+nnoremap <silent><Leader>cc :call clearmatches()<CR>:noh<CR>
 
 " -----------------------------------------------------------
 " => h: window-resize
 " -----------------------------------------------------------
-nnoremap <Leader><Bar> <C-w><Bar>
 nnoremap <Leader>= <C-w>=
 nnoremap <Leader>o <C-w>o
 nnoremap <Leader>v <C-w>v
+nnoremap <Leader>x <C-w>s
 
 " http://stackoverflow.com/questions/1262154/minimizing-vertical-vim-window-splits
 " z{nr}<CR>  Set current window height to {nr}.
@@ -301,6 +307,8 @@ nmap <Leader># [I
 nnoremap <Leader>g* :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<CR><C-w>W
 " find last search in quickfix
 " nnoremap <Leader>/ :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR><C-w>W
+" buf-search (shift + F3)
+nnoremap <F3> :cex []<BAR>bufdo vimgrepadd @@g %<BAR>cw<s-left><s-left><right>
 
 " -----------------------------------------------------------
 " => Insert mode mappings
@@ -309,7 +317,7 @@ nnoremap <Leader>g* :execute "vimgrep ".expand("<cword>")." %"<CR>:copen<CR><C-w
 inoremap <S-Return> <C-o>o
 
 " insert absolute current buffer path
-inoremap <F2> <C-R>=expand('%:p')<CR>
+inoremap <F4> <C-R>=expand('%:p')<CR>
 
 " quick movements
 " http://vim.wikia.com/wiki/Quick_command_in_insert_mode
@@ -325,6 +333,12 @@ inoremap UU <Esc>gUiw`]a
 
 imap     <Nul> <C-Space>
 inoremap <C-Space> <C-x><C-l>
+
+" http://superuser.com/a/1165038/578741
+inoremap <F2> <C-\><C-o>:w<CR>
+inoremap ;hh <Esc>:w<CR>
+
+inoremap <insert> <C-r>*
 
 " -----------------------------------------------------------
 " => Visual and Select mode mappings
@@ -354,9 +368,12 @@ xnoremap > >gv
 " refer to the directory of the current file, regardless of pwd
 cnoremap %% <C-R>=expand('%:h').'/'<CR>
 " quick save without hitting enter
-cnoremap ww <C-u>w<CR>
+cnoremap hh <C-u>w<CR>
 " close location list
-cnoremap cc <C-u>lcl<CR>
+" cnoremap cc <C-u>lcl<CR>
+cnoremap ww <C-u>pwd<CR>
+" Quit all, but ask to save
+cnoremap ;; <C-u>qa<CR>
 
 cnoremap <C-A> <Home>
 cnoremap <C-O> <Up>
@@ -411,7 +428,6 @@ augroup END
 " ============================================================================
 " 'tpope/vim-fugitive' {{{
 " ============================================================================
-
 nnoremap <silent> <leader>gg :Gstatus<CR>
 nnoremap <silent> <leader>gd :Gdiff<CR>
 nnoremap <silent> <leader>gcc :Gcommit<CR>
@@ -420,17 +436,19 @@ nnoremap <silent> <leader>gl :Glog<CR>
 nnoremap <silent> <leader>gv :Gvsplit<CR>
 nnoremap <silent> <leader>gp :Git push<CR>
 " Git add %
-nnoremap <silent> <leader>gw :Gwrite<CR>
+" gs for g stage
+nnoremap <silent> <leader>gs :Gwrite<CR>
 " Git rm %
 nnoremap <silent> <leader>gx :Gremove<CR>
 " Git checkout %
 nnoremap <silent> <leader>gu :Gread<CR>
 
+au FileType gitcommit nnoremap <buffer> <silent> cn :<C-U>Gcommit --amend --date="$(date)"<CR>
+
 " }}}
 " ============================================================================
 " 'junegunn/gv.vim' {{{
 " ============================================================================
-
 " Commits All
 nnoremap <silent> <leader>gca :GV<CR>
 " Commitns Only of the current file
@@ -442,11 +460,10 @@ nnoremap <silent> <leader>gcr :GV?<CR>
 " ============================================================================
 " 'romainl/vim-qf' {{{
 " ============================================================================
-
 let g:qf_mapping_ack_style = 1
-nmap <Leader>cc <Plug>QfCtoggle
-nmap <Leader>ll <Plug>QfLtoggle
-nmap z. <Plug>QfSwitch
+nmap <F11> <Plug>QfLtoggle
+nmap <F23> <Plug>QfCtoggle
+nmap <Leader>~ <Plug>QfSwitch
 
 " }}}
 " ============================================================================
