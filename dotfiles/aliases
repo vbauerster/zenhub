@@ -27,5 +27,4 @@ alias tmn='tmux new -s $(basename $(pwd))'
 alias tml='tmux list-sessions'
 
 alias dcrypt='/opt/etc/init.d/S09dnscrypt-proxy'
-alias up1='cat /etc/openvpn/client1/up'
-alias up2='cat /etc/openvpn/client2/up'
+alias vpninit='/opt/etc/init.d/S20openvpn'
